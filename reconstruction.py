@@ -9,7 +9,11 @@ import os
 #           os.system('sh cythonize.sh')
 
 import pyximport
-pyximport.install()        
+#pyximport.install()
+import numpy
+pyximport.install(setup_args={"script_args":["--compiler=mingw32"],
+                              "include_dirs":numpy.get_include()},
+                  reload_support=True)        
 from concurrent import futures
 from subprocess import Popen, PIPE
 import signal,time
