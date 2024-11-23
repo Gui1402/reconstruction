@@ -7,7 +7,9 @@ import os
           
 # if cythonized==False:
 #           os.system('sh cythonize.sh')
-        
+
+import pyximport
+pyximport.install()        
 from concurrent import futures
 from subprocess import Popen, PIPE
 import signal,time
