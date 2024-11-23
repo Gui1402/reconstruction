@@ -1,6 +1,6 @@
 {
 # DATA FORMAT
-'rawdata_tier' : 'root',
+'rawdata_tier' : 'midas',
 
 # DETECTOR
 'geometry'  : 'lime',
