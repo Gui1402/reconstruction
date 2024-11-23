@@ -29,6 +29,7 @@
 
 # Setting environments parameters
 
+'pedrun'                : 12163,
 'offline'               : True,		#if False it reads the logbook from online, if true it reads the runlog_tag_auto.csv locally
 'rebin'                 : 4,
 'nsigma'                : 0.6,
