@@ -212,7 +212,11 @@ class analysis:
             return len(pics)
             
         run,tmpdir,tag = self.tmpname
-        mf = sw.swift_download_midas_file(run,tmpdir,tag)     #you download the file here so that in multithread does not confuse if it downloaded or not
+        try:
+            mf = sw.swift_download_midas_file(run,tmpdir,tag)     #you download the file here so that in multithread does not confuse if it downloaded or not
+        except Exception as e:
+            raise Exception(f"Errei aqui hein \n {run} \n {tmpdir} \n {tag}")
+        
         if options.offline==False:
             df = cy.read_cygno_logbook(tag=options.tag,start_run=run-2000,end_run=run+1)
         else:
@@ -264,10 +268,9 @@ class analysis:
             mf = [0] # dummy array to make a common loop with MIDAS case
         else:
             sigrun,tmpdir,tag = self.tmpname
-            try:
-                mf = sw.swift_download_midas_file(options.pedrun,tmpdir,tag)
-            except:
-                raise Exception("Errei aqui hein")
+            
+            mf = sw.swift_download_midas_file(options.pedrun,tmpdir,tag)
+            
             #mf = self.tmpname
 
         # first calculate the mean 
