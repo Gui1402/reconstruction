@@ -264,7 +264,10 @@ class analysis:
             mf = [0] # dummy array to make a common loop with MIDAS case
         else:
             sigrun,tmpdir,tag = self.tmpname
-            mf = sw.swift_download_midas_file(options.pedrun,tmpdir,tag)
+            try:
+                mf = sw.swift_download_midas_file(options.pedrun,tmpdir,tag)
+            except:
+                raise Exception("Errei aqui hein")
             #mf = self.tmpname
 
         # first calculate the mean 
