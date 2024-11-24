@@ -215,7 +215,8 @@ class analysis:
         try:
             mf = sw.swift_download_midas_file(run,tmpdir,tag)     #you download the file here so that in multithread does not confuse if it downloaded or not
         except Exception as e:
-            raise Exception(f"Errei aqui hein \n {run} \n {tmpdir} \n {tag}")
+            #tf = sw.swift_read_root_file(self.tmpname)
+            raise Exception(f"Errei aqui hein \n \n {self.tmpname}")
         
         if options.offline==False:
             df = cy.read_cygno_logbook(tag=options.tag,start_run=run-2000,end_run=run+1)
