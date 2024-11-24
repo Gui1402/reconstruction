@@ -438,8 +438,9 @@ class analysis:
                 
                 odb,corrected,channels_offsets,camera_exposure = utilities.get_odb_pmt_info(mf,self.options,run)
 
-            mf.jump_to_start()
-            dslow = pd.DataFrame()
+            if options.sim == False:
+                mf.jump_to_start()
+                dslow = pd.DataFrame()
             if self.options.environment_variables:
         
                 odb = cy.get_bor_odb(mf)
