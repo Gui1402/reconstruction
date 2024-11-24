@@ -420,8 +420,17 @@ class analysis:
             mf = [0] # dummy array to make a common loop with MIDAS case
 
         elif self.options.rawdata_tier == 'midas':
-            run,tmpdir,tag = self.tmpname
-            mf = sw.swift_download_midas_file(run,tmpdir,tag)
+            if options.sim == True:
+                run,tmpdir,tag = self.tmpname
+                prefix = 'histograms_Run'
+                postfix = 'root'
+                file_path = "%s%s%05d.%s" % (tmpdir,prefix,run,postfix)
+                tf = sw.swift_read_root_file(file_path)
+                keys = tf.keys()
+                mf = [0]
+            else:
+                run,tmpdir,tag = self.tmpname
+                mf = sw.swift_download_midas_file(run,tmpdir,tag)
             
             ## Necessary to read the ODB to retrieve some info necessary for the waveform analysis
             ## Seems to repeat the opening process but *doesn't* slow down the code.
