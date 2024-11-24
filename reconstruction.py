@@ -41,6 +41,28 @@ utilities = utilities.utils()
 
 from waveform import PMTreco
 
+
+import tensorflow as tf
+
+
+utilities = utilities.utils()
+
+def convert_image_to_float(img, a, b):
+    clipped_img = np.clip(img, a, b)
+    clipped_img = (clipped_img - a)/(b-a)
+    return clipped_img.astype(np.float16)
+
+def apply_unet_image(input_image, model):
+    input_image = convert_image_to_float(input_image, -60, 100)
+    size = 1728
+    min_x = 288
+    max_x = 2016
+    prediction = model.predict(input_image[min_x: max_x, min_x: max_x].reshape(1, size, size, 1))
+    prediction_img = prediction["img_output"][0, :, :, 0]
+    padded_image = np.zeros((2304,2304))
+    padded_image[min_x: max_x, min_x: max_x] = prediction_img
+    return padded_image
+
 class analysis:
 
     def __init__(self,options):
@@ -650,9 +672,14 @@ class analysis:
                             #print("you are in poor mode")
                             img_fr_satcor = img_fr_sub
                         t_pre2 = time.perf_counter()
-                        img_fr_zs  = ctools.zsfullres(img_fr_satcor,self.noisearr_fr,nsigma=self.options.nsigma)
+                        if self.options.apply_unet:   
+                                prediction_img = apply_unet_image(img_fr_satcor, self.options.unet_model)
+                                threshold_mask = 1*(prediction_img>=0.15)
+                                img_fr_zs = img_fr_satcor * threshold_mask
+                        else:  
+                            img_fr_zs  = ctools.zsfullres(img_fr_satcor,self.noisearr_fr,nsigma=self.options.nsigma)
                         t_pre3 = time.perf_counter()
-                        img_fr_zs_acc = ctools.acceptance(img_fr_zs,self.cg.ymin,self.cg.ymax,self.cg.xmin,self.cg.xmax)
+                        img_fr_zs_acc = ctools.acceptance(img_fr_zs,288,2016,288,2016)
                         t_pre4 = time.perf_counter()
                         img_rb_zs  = ctools.arrrebin(img_fr_zs_acc,self.rebin)
                         t_pre5 = time.perf_counter()
@@ -916,6 +943,14 @@ if __name__ == '__main__':
           USER = "autoreco"
     #tmpdir = '/mnt/ssdcache/' if os.path.exists('/mnt/ssdcache/') else '/tmp/'
     # it seems that ssdcache it is only mounted on cygno-login, not in the batch queues (neither in cygno-custom)
+    
+    if options.apply_unet == True:        
+        model = tf.keras.Sequential([
+            tf.keras.layers.InputLayer(input_shape=(1728, 1728, 1)),
+            tf.keras.layers.TFSMLayer(options.unet_path, call_endpoint='serving_default')
+        ])
+        options.unet_model = model
+    
     tmpdir = '/tmp'
     os.system('mkdir -p {tmpdir}/{user}'.format(tmpdir=tmpdir,user=USER))
     tmpdir = '{tmpdir}/{user}/'.format(tmpdir=tmpdir,user=USER) if not options.tmpdir else options.tmpdir+"/"

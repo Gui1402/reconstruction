@@ -59,28 +59,35 @@ class SnakesFactory:
         tip = self.options.tip
         
         #-----Pre-Processing----------------#
-        rescalex=int(self.geometry.npixx/self.rebin)
-        rescaley=int(self.geometry.npixy/self.rebin)
+        if self.options.apply_preproc:
+            rescalex=int(self.geometry.npixx/self.rebin)
+            rescaley=int(self.geometry.npixy/self.rebin)
 
-        t0 = time.perf_counter()
-        filtimage = median_filter(self.image_fr_zs, size=2)
-        t1_med = time.perf_counter()
-        edges = self.ct.arrrebin(filtimage,self.rebin)
-        edcopy = edges.copy()
-        t0_noise = time.perf_counter()
-        #edcopyTight = nred_cython(edcopy, rescalex, rescaley, self.options.min_neighbors_average)
-        edcopyTight = tl.noisereductor(edcopy, rescalex, self.options.min_neighbors_average)
-        t1_noise = time.perf_counter()
+            t0 = time.perf_counter()
+            filtimage = median_filter(self.image_fr_zs, size=2)
+            t1_med = time.perf_counter()
+            edges = self.ct.arrrebin(filtimage,self.rebin)
+            edcopy = edges.copy()
+            t0_noise = time.perf_counter()
+            #edcopyTight = nred_cython(edcopy, rescalex, rescaley, self.options.min_neighbors_average)
+            edcopyTight = tl.noisereductor(edcopy, rescalex, self.options.min_neighbors_average)
+            t1_noise = time.perf_counter()
 
-        t_medianfilter = t1_med - t0
-        t_noisered = t1_noise - t0_noise
+            t_medianfilter = t1_med - t0
+            t_noisered = t1_noise - t0_noise
 
-        
-        # make the clustering with DBSCAN algo
-        # this kills all macrobins with N photons < 1
-        points = np.array(np.nonzero(np.round(edcopyTight))).astype(int).T
-        lp = points.shape[0]
+            
+            # make the clustering with DBSCAN algo
+            # this kills all macrobins with N photons < 1
+            points = np.array(np.nonzero(np.round(edcopyTight))).astype(int).T
+            lp = points.shape[0]
+        else:
+            y_coords, x_coords = np.where(self.image_fr_zs != 0)
 
+            # Combine these coordinates into a single array of shape Nx2
+            points = np.column_stack((x_coords, y_coords))
+            lp = points.shape[0]
+            print(f"lp: {lp}")
         ## apply vignetting (if not applied, vignette map is all ones)
         ## this is done only for energy calculation, not for clustering (would make it crazy)
         image_fr_vignetted = self.ct.vignette_corr(self.image_fr,self.vignette)
