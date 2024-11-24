@@ -510,14 +510,23 @@ class analysis:
                 #print(name)
 
                 if self.options.rawdata_tier == 'root':
-                    if 'pic' in name:
+                    pattern = r'pic_ev_(real|mask)_(\d+)_(\d+\.\d+);1'
+                    match = re.search(pattern, name)
+                    type_im = match.group(1)
+                    event_id = match.group(2)
+                    energy = match.group(3)
+                    if ('pic' in name) & (type_im == "real"):
                         print(name)
-                        patt = re.compile('\S+run(\d+)_ev(\d+)')
-                        m = patt.match(name)
-                        run = int(m.group(1))
-                        event = int(m.group(2))
-                        img_fr = utilities.rootflip(tf,key,self.options.tag)     #necessary to uniform root raw data to midas. This is a vertical flip (raw data differ between ROOT and MIDAS formats)
+                        #patt = re.compile('\S+run(\d+)_ev(\d+)')
+                        #m = patt.match(name)
+                        run = 1
+                        event = int(event_id)
+                        #event = int(m.group(2))
+                        obj = tf[key].values()
+                        #obj = np.rot90(obj)
                         camera=True
+                    else:
+                        camera=False
 
                 elif self.options.rawdata_tier == 'h5':
                     if 'pic' in name:
