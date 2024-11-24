@@ -511,6 +511,7 @@ class analysis:
 
                 if self.options.rawdata_tier == 'root':
                     if 'pic' in name:
+                        print(name)
                         patt = re.compile('\S+run(\d+)_ev(\d+)')
                         m = patt.match(name)
                         run = int(m.group(1))
