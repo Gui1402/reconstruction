@@ -434,34 +434,35 @@ class analysis:
             
             ## Necessary to read the ODB to retrieve some info necessary for the waveform analysis
             ## Seems to repeat the opening process but *doesn't* slow down the code.
-            if self.options.pmt_mode == 1:        
-                
-                odb,corrected,channels_offsets,camera_exposure = utilities.get_odb_pmt_info(mf,self.options,run)
-
+            
             if options.sim == False:
+                if self.options.pmt_mode == 1:        
+                    
+                    odb,corrected,channels_offsets,camera_exposure = utilities.get_odb_pmt_info(mf,self.options,run)
+
                 mf.jump_to_start()
                 dslow = pd.DataFrame()
-            if self.options.environment_variables:
-        
-                odb = cy.get_bor_odb(mf)
-                header_environment = odb.data['Equipment']['Environment']['Settings']['Names Input']
-                value_variables = odb.data['Equipment']['Environment']['Variables']
-                dslow = pd.DataFrame(columns = header_environment)
-                dslow.loc[len(dslow)] = value_variables['Input']
-                for i in dslow.keys():
-                    #try:
-                    dslow = utilities.conversion_env_variables(dslow, odb, i, j_env = 0)
-                    #except:
-                        #print("WARNING: conversion_env_variables failed.")
-                try:
-                   self.autotree.fillEnvVariables(dslow.take([0]))
-                   if not self.options.camera_mode:
-                            self.outTree.fill()
-                except:
-                   print("WARNING: could not fill dslow variables.")   
-                #print(dslow)
+                if self.options.environment_variables:
+            
+                    odb = cy.get_bor_odb(mf)
+                    header_environment = odb.data['Equipment']['Environment']['Settings']['Names Input']
+                    value_variables = odb.data['Equipment']['Environment']['Variables']
+                    dslow = pd.DataFrame(columns = header_environment)
+                    dslow.loc[len(dslow)] = value_variables['Input']
+                    for i in dslow.keys():
+                        #try:
+                        dslow = utilities.conversion_env_variables(dslow, odb, i, j_env = 0)
+                        #except:
+                            #print("WARNING: conversion_env_variables failed.")
+                    try:
+                        self.autotree.fillEnvVariables(dslow.take([0]))
+                        if not self.options.camera_mode:
+                                    self.outTree.fill()
+                    except:
+                        print("WARNING: could not fill dslow variables.")   
+                    #print(dslow)
 
-                j_env = 1
+                    j_env = 1
 
         numev = 0
         event=0
@@ -476,38 +477,38 @@ class analysis:
         timestamp = -1
         timestamp0 = 0
 
-        for mevent in mf:
-            if self.options.rawdata_tier == 'midas':
-                if mevent.header.is_midas_internal_event():
-                    continue
-                else:
-                    keys = mevent.banks.keys()
+        # for mevent in mf:
+        #     if self.options.rawdata_tier == 'midas':
+        #         if mevent.header.is_midas_internal_event():
+        #             continue
+        #         else:
+        #             keys = mevent.banks.keys()
 
-            if camera_read and pmt_read:
-                numev +=1   
-            camera_read = False         #only useful for midas read 
-            pmt_read = False            #only useful for midas read
-            if self.options.pmt_mode == 0:
-                pmt_read = True
-            else:
-                if exist_cam and not exist_pmt:
-                    fails_count +=1
-                    if fails_count==3:
-                        print('\nCareful: you set the PMT analysis ON but no PMT bank was found. Are you sure PMT data is available for this run?\n ANALYSIS FAILED')
-                        sys.exit()
-                    else:
-                         exist_pmt = False
-                         exist_cam = False   
+        #     if camera_read and pmt_read:
+        #         numev +=1   
+        #     camera_read = False         #only useful for midas read 
+        #     pmt_read = False            #only useful for midas read
+        #     if self.options.pmt_mode == 0:
+        #         pmt_read = True
+        #     else:
+        #         if exist_cam and not exist_pmt:
+        #             fails_count +=1
+        #             if fails_count==3:
+        #                 print('\nCareful: you set the PMT analysis ON but no PMT bank was found. Are you sure PMT data is available for this run?\n ANALYSIS FAILED')
+        #                 sys.exit()
+        #             else:
+        #                  exist_pmt = False
+        #                  exist_cam = False   
             
-            if self.options.rawdata_tier == 'midas':
-                timestamp=mevent.header.timestamp
+        #     if self.options.rawdata_tier == 'midas':
+        #         timestamp=mevent.header.timestamp
 
             for iobj,key in enumerate(keys):
                 name=key
                 camera = False
                 pmt = False
                 #print(name)
-
+                self.options.rawdata_tier = 'root'
                 if self.options.rawdata_tier == 'root':
                     if 'pic' in name:
                         patt = re.compile('\S+run(\d+)_ev(\d+)')
