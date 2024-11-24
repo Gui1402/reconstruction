@@ -28,7 +28,7 @@
 'figsizeX'              : 12,
 
 # Setting environments parameters
-'sim'                   : True
+'sim'                   : True,
 'pedrun'                : 12163,
 'offline'               : True,		#if False it reads the logbook from online, if true it reads the runlog_tag_auto.csv locally
 'rebin'                 : 4,
