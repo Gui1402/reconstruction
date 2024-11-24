@@ -672,7 +672,7 @@ class analysis:
                         t_pre2 = time.perf_counter()
                         if self.options.apply_unet:   
                                 prediction_img = apply_unet_image(img_fr_satcor, self.options.unet_model)
-                                threshold_mask = 1*(prediction_img>=0.15)
+                                threshold_mask = 1*(prediction_img>=self.options.unet_threshold)
                                 img_fr_zs = img_fr_satcor * threshold_mask
                         else:  
                             img_fr_zs  = ctools.zsfullres(img_fr_satcor,self.noisearr_fr,nsigma=self.options.nsigma)
