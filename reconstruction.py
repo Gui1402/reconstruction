@@ -45,8 +45,6 @@ from waveform import PMTreco
 import tensorflow as tf
 
 
-utilities = utilities.utils()
-
 def convert_image_to_float(img, a, b):
     clipped_img = np.clip(img, a, b)
     clipped_img = (clipped_img - a)/(b-a)
