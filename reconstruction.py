@@ -523,6 +523,7 @@ class analysis:
                         event = int(event_id)
                         #event = int(m.group(2))
                         obj = tf[key].values()
+                        img_fr = obj.T
                         #obj = np.rot90(obj)
                         camera=True
                     else:
