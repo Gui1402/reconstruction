@@ -218,7 +218,7 @@ class analysis:
             #tf = sw.swift_read_root_file(self.tmpname)
             prefix = 'histograms_Run'
             postfix = '.root'
-            file_path = "%s/%s%05d.%s" % (tmpdir,prefix,run,postfix)
+            file_path = "%s%s%05d.%s" % (tmpdir,prefix,run,postfix)
             raise Exception(f"Errei aqui hein \n \n {file_path}")
         
         if options.offline==False:
