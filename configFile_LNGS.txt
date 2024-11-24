@@ -33,7 +33,7 @@
 'sim'                   : True,
 'pedrun'                : 12163,
 'offline'               : True,		#if False it reads the logbook from online, if true it reads the runlog_tag_auto.csv locally
-'rebin'                 : 4,
+'rebin'                 : 1,
 'nsigma'                : 0.2,
 'min_neighbors_average' : 1.25,                   # cut on the minimum average energy around a pixel (remove isolated macro-pixels)
 'cimax'                 : 5000,                    # Upper threshold (keep very high not to kill large signals)
